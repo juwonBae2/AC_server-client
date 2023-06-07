@@ -1,4 +1,4 @@
-#include "consoleStlye.h"
+#include "consoleStlye.hpp"
 
 namespace console_stlye
 {

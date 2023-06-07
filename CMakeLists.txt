@@ -1,6 +1,10 @@
 # CMake버전 3.24.2
 cmake_minimum_required(VERSION 3.24.2)
 
+# 프로젝트 이름과 몇가지 유용한 설정
+project(server-client VERSION 1.0.0
+                   LANGUAGES C CXX)
+
 # 빌드 속도 향상
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -123,6 +127,6 @@ function(add_subdirectory_with_static_analysis TARGET_NAME)
 endfunction()
 
 # add_subdirectorys
+add_subdirectory_with_static_analysis(consoleStlye)
 add_subdirectory_with_static_analysis(client)
 add_subdirectory_with_static_analysis(server)
-# add_subdirectory_with_static_analysis(consoleStlye)

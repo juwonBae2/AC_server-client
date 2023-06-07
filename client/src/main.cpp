@@ -1,7 +1,6 @@
 #include <iostream>
 #include "spdlog/fmt/fmt.h"
-#include "../consoleStlye/include/consoleStlye.h"
-// #include "consoleStlye.h"
+#include "consoleStlye.hpp"
 
 int main()
 {
