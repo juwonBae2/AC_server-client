@@ -1,6 +1,7 @@
 #include <iostream>
 #include "spdlog/fmt/fmt.h"
-#include "consoleStlye.hpp"
+#include "consoleStyle.hpp"
+#include "color.hpp"
 
 int main()
 {

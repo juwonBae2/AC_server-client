@@ -1,7 +1,7 @@
-project(consoleStlye)
+project(consoleStyle)
 
 add_library(${PROJECT_NAME}
-    src/consoleStlye.cpp
+    src/consoleStyle.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
