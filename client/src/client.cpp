@@ -3,16 +3,29 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
+#include <thread>
 
 #define PORT 7777
+
+void receiveMessages(int sock)
+{
+    char buffer[1024] = {0};
+    while (true)
+    {
+        int valread = read(sock, buffer, 1024);
+        if (valread > 0)
+        {
+            std::cout << "Server: " << buffer << std::endl;
+        }
+        memset(buffer, 0, sizeof(buffer));
+    }
+}
 
 int main(int argc, char const *argv[])
 {
     int sock = 0;
-    int valread;
     struct sockaddr_in serv_addr;
     const char *hello = "Hello from client";
-    char buffer[1024] = {0};
 
     // Create socket file descriptor
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -38,6 +51,9 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
+    // Start a separate thread to receive messages from the server
+    std::thread receiveThread(receiveMessages, sock);
+
     // Send and receive messages
     while (true)
     {
@@ -50,17 +66,13 @@ int main(int argc, char const *argv[])
         // Check if the user wants to exit
         if (message == "exit")
             break;
-
-        // Receive message from the server
-        valread = read(sock, buffer, 1024);
-        std::cout << "Server: " << buffer << std::endl;
-
-        // Clear the buffer
-        memset(buffer, 0, sizeof(buffer));
     }
 
     // Close the socket
     close(sock);
+
+    // Join the receive thread
+    receiveThread.join();
 
     return 0;
 }

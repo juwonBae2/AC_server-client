@@ -4,49 +4,8 @@
 #include <cstring>
 #include <unistd.h>
 #include <vector>
-#include <thread>
 
 #define PORT 7777
-
-std::vector<int> clientSockets; // Stores connected client sockets
-
-void handleClient(int clientSocket)
-{
-    char buffer[1024] = {0};
-    while (true)
-    {
-        int valread = read(clientSocket, buffer, 1024);
-        if (valread > 0)
-        {
-            std::cout << "Client: " << buffer << std::endl;
-            if (strcmp(buffer, "exit") == 0)
-                break;
-
-            // Send message to all connected clients
-            for (int socket : clientSockets)
-            {
-                if (socket != clientSocket)
-                    send(socket, buffer, strlen(buffer), 0);
-            }
-
-            // Clear the buffer
-            memset(buffer, 0, sizeof(buffer));
-        }
-        else if (valread == 0)
-        {
-            // Connection closed by the client
-            std::cout << "Client: " << clientSocket << " disconnected" << std::endl;
-            // Remove the client socket from the vector
-            auto it = std::find(clientSockets.begin(), clientSockets.end(), clientSocket);
-            if (it != clientSockets.end())
-                clientSockets.erase(it);
-
-            // Close the client socket
-            close(clientSocket);
-            break;
-        }
-    }
-}
 
 int main()
 {
@@ -56,6 +15,8 @@ int main()
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
     const char *hello = "Hello from server";
+    std::vector<int> clientSockets; // Stores connected client sockets
+
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -104,9 +65,18 @@ int main()
         // Add the new client socket to the vector
         clientSockets.push_back(new_socket);
 
-        // Start a new thread to handle the client
-        std::thread clientThread(handleClient, new_socket);
-        clientThread.detach();
+        // Receive message from the client
+        valread = read(new_socket, buffer, 1024);
+        std::cout << "Client: " << buffer << std::endl;
+
+        // Send message to all connected clients
+        for (int clientSocket : clientSockets)
+        {
+            send(clientSocket, buffer, strlen(buffer), 0);
+        }
+
+        // Clear the buffer
+        memset(buffer, 0, sizeof(buffer));
     }
 
     // Close all client sockets
