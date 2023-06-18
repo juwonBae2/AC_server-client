@@ -18,7 +18,8 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        spdlog::spdlog
+        # TODO: consoleStlye내 cmake를 받게 되어 있으니 이건 지워도 되나..??
+        # spdlog::spdlog
         sfml-graphics
         sfml-window
         sfml-system
