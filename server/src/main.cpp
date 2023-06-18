@@ -1,118 +1,92 @@
 #include <iostream>
-#include <cstring>
 #include <sys/socket.h>
-#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <cstring>
 #include <unistd.h>
 #include <vector>
-#include <thread>
 
-std::vector<int> clientSockets;
-
-void handleClient(int clientSocket)
-{
-    char buffer[1024];
-    int n;
-
-    while (true)
-    {
-        // 클라이언트로부터 메시지 수신
-        memset(buffer, '\0', sizeof(buffer));
-        n = recv(clientSocket, buffer, sizeof(buffer), 0);
-        if (n <= 0)
-        {
-            std::cerr << "클라이언트와의 연결이 종료되었습니다." << std::endl;
-            break;
-        }
-
-        std::cout << "클라이언트 #" << clientSocket << ": " << buffer << std::endl;
-
-        // 종료 메시지 수신 시 클라이언트 연결 종료
-        if (strcmp(buffer, "종료") == 0)
-            break;
-
-        // 다른 클라이언트들에게 메시지 전달
-        for (int client : clientSockets)
-        {
-            if (client != clientSocket)
-            {
-                send(client, buffer, n, 0);
-            }
-        }
-    }
-
-    // 클라이언트 소켓 종료 및 제거
-    close(clientSocket);
-    auto it = std::find(clientSockets.begin(), clientSockets.end(), clientSocket);
-    if (it != clientSockets.end())
-    {
-        clientSockets.erase(it);
-    }
-}
+#define PORT 7777
 
 int main()
 {
-    int serverSocket, newSocket, portNum, clientLen;
-    struct sockaddr_in serverAddr
-    {
-    }, clientAddr{};
-    std::string welcomeMessage = "채팅에 오신 것을 환영합니다!";
+    int server_fd, new_socket, valread;
+    struct sockaddr_in address;
+    int opt = 1;
+    int addrlen = sizeof(address);
+    char buffer[1024] = {0};
+    const char *hello = "Hello from server";
+    std::vector<int> clientSockets; // Stores connected client sockets
 
-    // 소켓 생성
-    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (serverSocket < 0)
+    // Creating socket file descriptor
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
-        std::cerr << "소켓 생성에 실패했습니다." << std::endl;
-        return 1;
+        std::cerr << "Socket creation error" << std::endl;
+        return -1;
     }
 
-    // 서버 주소 초기화
-    memset(&serverAddr, '\0', sizeof(serverAddr));
-    portNum = 12345;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(portNum);
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    // Attaching socket to the port
+    int status = setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    // 소켓 바인딩
-    if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
+    std::cout << status << std::endl;
+    if (status)
     {
-        std::cerr << "바인딩에 실패했습니다." << std::endl;
-        return 1;
+        std::cerr << "Setsockopt error" << std::endl;
+        return -1;
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+
+    // Bind the socket to the specified port
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+    {
+        std::cerr << "Bind failed" << std::endl;
+        return -1;
     }
 
-    // 연결 대기
-    if (listen(serverSocket, 10) < 0)
+    // Listen for incoming connections
+    if (listen(server_fd, 3) < 0)
     {
-        std::cerr << "연결 대기에 실패했습니다." << std::endl;
-        return 1;
+        std::cerr << "Listen error" << std::endl;
+        return -1;
     }
 
-    std::cout << "채팅 서버가 실행 중입니다." << std::endl;
-
-    clientLen = sizeof(clientAddr);
+    std::cout << "Server is listening on port " << PORT << std::endl;
 
     while (true)
     {
-        // 클라이언트로부터 연결 요청 대기
-        newSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, (socklen_t *)&clientLen);
-        if (newSocket < 0)
+        // Accept incoming connections
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0)
         {
-            std::cerr << "연결 수락에 실패했습니다." << std::endl;
-            return 1;
+            std::cerr << "Accept error" << std::endl;
+            return -1;
         }
 
-        // 클라이언트에게 환영 메시지 전송
-        send(newSocket, welcomeMessage.c_str(), welcomeMessage.length(), 0);
+        // Add the new client socket to the vector
+        clientSockets.push_back(new_socket);
 
-        // 연결된 클라이언트 소켓을 저장
-        clientSockets.push_back(newSocket);
+        // Receive message from the client
+        valread = read(new_socket, buffer, 1024);
+        std::cout << "Client: " << buffer << std::endl;
 
-        // 클라이언트를 처리하기 위한 스레드 생성
-        std::thread clientThread(handleClient, newSocket);
-        clientThread.detach();
+        // Send message to all connected clients
+        for (int clientSocket : clientSockets)
+        {
+            send(clientSocket, buffer, strlen(buffer), 0);
+        }
+
+        // Clear the buffer
+        memset(buffer, 0, sizeof(buffer));
     }
 
-    // 소켓 종료
-    close(serverSocket);
+    // Close all client sockets
+    for (int clientSocket : clientSockets)
+    {
+        close(clientSocket);
+    }
+
+    // Close the server socket
+    close(server_fd);
 
     return 0;
 }
