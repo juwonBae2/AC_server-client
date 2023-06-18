@@ -1,66 +1,72 @@
 #include <iostream>
+#include <cstring>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <cstring>
 
-#define PORT 7777
-
-int main(int argc, char const *argv[])
+int main()
 {
-    int sock = 0;
-    int valread;
-    struct sockaddr_in serv_addr;
-    const char *hello = "Hello from client";
-    char buffer[1024] = {0};
-
-    // Create socket file descriptor
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    int clientSocket, portNum, n;
+    char buffer[1024];
+    struct sockaddr_in serverAddr
     {
-        std::cerr << "Socket creation error" << std::endl;
-        return -1;
+    };
+    std::string serverIP = "127.0.0.1";
+
+    // 소켓 생성
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (clientSocket < 0)
+    {
+        std::cerr << "소켓 생성에 실패했습니다." << std::endl;
+        return 1;
     }
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0)
+    // 서버 주소 초기화
+    memset(&serverAddr, '\0', sizeof(serverAddr));
+    portNum = 12345;
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(portNum);
+    if (inet_pton(AF_INET, serverIP.c_str(), &(serverAddr.sin_addr)) <= 0)
     {
-        std::cerr << "Invalid address/ Address not supported" << std::endl;
-        return -1;
+        std::cerr << "IP 주소 설정에 실패했습니다." << std::endl;
+        return 1;
     }
 
-    // Connect to the server
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    // 서버에 연결
+    if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
     {
-        std::cerr << "Connection Failed" << std::endl;
-        return -1;
+        std::cerr << "서버에 연결할 수 없습니다." << std::endl;
+        return 1;
     }
 
-    // Send and receive messages
     while (true)
     {
-        // Send message to the server
-        std::string message;
-        std::cout << "Enter a message: ";
-        std::getline(std::cin, message);
-        send(sock, message.c_str(), message.length(), 0);
+        // 서버로부터 메시지 수신
+        memset(buffer, '\0', sizeof(buffer));
+        n = recv(clientSocket, buffer, sizeof(buffer), 0);
+        if (n <= 0)
+        {
+            std::cerr << "메시지 수신에 실패했습니다." << std::endl;
+            break;
+        }
 
-        // Check if the user wants to exit
-        if (message == "exit")
+        std::cout << "서버: " << buffer << std::endl;
+
+        // 종료 메시지 수신 시 채팅 종료
+        if (strcmp(buffer, "종료") == 0)
             break;
 
-        // Receive message from the server
-        valread = read(sock, buffer, 1024);
-        std::cout << "Server: " << buffer << std::endl;
+        // 사용자로부터 메시지 입력
+        std::cout << "사용자: ";
+        std::string message;
+        std::getline(std::cin, message);
 
-        // Clear the buffer
-        memset(buffer, 0, sizeof(buffer));
+        // 메시지 서버로 전송
+        send(clientSocket, message.c_str(), message.length(), 0);
     }
 
-    // Close the socket
-    close(sock);
+    // 소켓 종료
+    close(clientSocket);
 
     return 0;
 }
