@@ -11,7 +11,17 @@ int main()
     struct sockaddr_in serverAddr
     {
     };
+
     std::string serverIP = "127.0.0.1";
+    // TODO: IP를 받게 할 지 안 할지는 미정
+    // std::string serverIP;
+    // std::cout << "서버의 IP 주소를 입력하세요: ";
+    // std::cin >> serverIP;
+
+    // TODO: 이거 왜 작동 안해
+    // 서버의 포트 번호 입력 받기
+    // std::cout << "서버의 포트 번호를 입력하세요: ";
+    // std::cin >> portNum;
 
     // 소켓 생성
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -50,7 +60,8 @@ int main()
             break;
         }
 
-        std::cout << "서버: " << buffer << std::endl;
+        // TODO: 서버를 통해서가 아닌 client 자체로 통신할지 안할지 여부
+        // std::cout << "서버: " << buffer << std::endl;
 
         // 종료 메시지 수신 시 채팅 종료
         if (strcmp(buffer, "종료") == 0)

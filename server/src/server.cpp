@@ -57,6 +57,11 @@ int main()
     }, clientAddr{};
     std::string welcomeMessage = "채팅에 오신 것을 환영합니다!";
 
+    // TODO: 이거 왜 작동 안 해
+    // 포트 번호 입력 받기
+    // std::cout << "사용할 포트 번호를 입력하세요: ";
+    // std::cin >> portNum;
+
     // 소켓 생성
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0)
@@ -85,6 +90,17 @@ int main()
         std::cerr << "연결 대기에 실패했습니다." << std::endl;
         return 1;
     }
+
+    // TODO: IP 까지 할 지 안 할지는 미정
+    // // 서버 IP 주소 출력
+    // struct sockaddr_in serverInfo
+    // {
+    // };
+    // socklen_t serverInfoLength = sizeof(serverInfo);
+    // getsockname(serverSocket, (struct sockaddr *)&serverInfo, &serverInfoLength);
+    // char ip[INET_ADDRSTRLEN];
+    // inet_ntop(AF_INET, &(serverInfo.sin_addr), ip, INET_ADDRSTRLEN);
+    // std::cout << "서버 IP 주소: " << ip << std::endl;
 
     std::cout << "채팅 서버가 실행 중입니다." << std::endl;
 
