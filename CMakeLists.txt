@@ -127,6 +127,6 @@ function(add_subdirectory_with_static_analysis TARGET_NAME)
 endfunction()
 
 # add_subdirectorys
-add_subdirectory_with_static_analysis(consoleStlye)
+add_subdirectory_with_static_analysis(consoleStyle)
 add_subdirectory_with_static_analysis(client)
 add_subdirectory_with_static_analysis(server)
