@@ -72,7 +72,7 @@ int main()
 
     // 서버 주소 초기화
     memset(&serverAddr, '\0', sizeof(serverAddr));
-    portNum = 12345;
+    portNum = 7777;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(portNum);
     serverAddr.sin_addr.s_addr = INADDR_ANY;
