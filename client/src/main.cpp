@@ -6,7 +6,6 @@ int main()
     int port_num = 7777;
 
     Client client(server_IP, port_num);
-    client.run();
 
     return 0;
 }

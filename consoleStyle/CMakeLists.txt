@@ -2,15 +2,19 @@ project(consoleStyle)
 
 add_library(${PROJECT_NAME}
     src/consoleStyle.cpp
-    src/test.cpp
-)
-
-target_include_directories(${PROJECT_NAME}
-    PUBLIC
-        include
+    src/functionTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         spdlog::spdlog
 )
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        include
+        ${PROJECT_BINARY_DIR}/include
+    PRIVATE
+        ${PROJECT_BINARY_DIR}/src
+)
+

@@ -4,6 +4,7 @@
 #include "spdlog/fmt/fmt.h"
 #include "client.hpp"
 #include "consoleStyle.hpp"
+#include "color.hpp"
 
 Client::Client(const std::string &server_IP, int port_num)
 {
@@ -15,7 +16,22 @@ Client::Client(const std::string &server_IP, int port_num)
         return;
     }
 
-    // 서버 주소 초기화
+    initializeServerAddress(server_address, server_IP, port_num);
+
+    if (!connectToServer(client_socket, server_address))
+    {
+        // 서버 연결 실패 시 처리
+        close(client_socket);
+        return;
+    }
+
+    // 채팅 시작
+    run();
+}
+
+// 서버 주소 초기화
+void Client::initializeServerAddress(struct sockaddr_in &server_address, const std::string &server_IP, int port_num)
+{
     memset(&server_address, '\0', sizeof(server_address));
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(port_num);
@@ -24,23 +40,27 @@ Client::Client(const std::string &server_IP, int port_num)
         std::cerr << "IP address setting failed." << std::endl;
         return;
     }
+}
 
-    std::string text = "Unable to connect to server.";
-    std::string inverseText = console_stlye::makeInverse(text);
-
+bool Client::connectToServer(int client_socket, const struct sockaddr_in &server_address)
+{
     // 서버에 연결
-    if (connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
+    int result = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
+    std::string server_connection_failure = console_stlye::makeInverse("Unable to connect to server.");
+
+    if (result < 0)
     {
-        std::cerr << inverseText << std::endl;
-        // std::cerr << "Unable to connect to server." << std::endl;
-        return;
+        std::cerr << server_connection_failure << std::endl;
+        return false;
     }
+
+    return true;
 }
 
 void Client::run()
 {
-    int n;
-    char buffer[1024];
+    int receive_message;
+    std::array<char, 1024> buffer;
 
     // std::string serverIP = "127.0.0.1";
     // TODO: IP를 받게 할 지 안 할지는 미정
@@ -55,10 +75,11 @@ void Client::run()
 
     while (true)
     {
+        buffer.fill('\0');
+
         // 서버로부터 메시지 수신
-        memset(buffer, '\0', sizeof(buffer));
-        n = recv(client_socket, buffer, sizeof(buffer), 0);
-        if (n <= 0)
+        receive_message = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
+        if (receive_message <= 0)
         {
             std::cerr << "Failed to receive message." << std::endl;
             break;
@@ -68,8 +89,10 @@ void Client::run()
         // std::cout << "Server: " << buffer << std::endl;
 
         // 종료 메시지 수신 시 채팅 종료
-        if (strcmp(buffer, "종료") == 0)
+        if (strcmp(buffer.data(), "exit") == 0)
+        {
             break;
+        }
 
         // 사용자로부터 메시지 입력
         std::cout << "User: ";
