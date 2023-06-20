@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-namespace autocrypt
+namespace color
 {
     template <typename T>
     std::string setColor(T const &value)

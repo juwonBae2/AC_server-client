@@ -5,11 +5,6 @@ add_executable(${PROJECT_NAME}
     src/server.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
-  PUBLIC
-    ${PROJECT_BINARY_DIR}/include
-)
-
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         spdlog::spdlog
@@ -18,4 +13,13 @@ target_link_libraries(${PROJECT_NAME}
         sfml-system
         sfml-audio
         sfml-network
+        consoleStyle
+)
+
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+    include
+    ${PROJECT_BINARY_DIR}/include
+  PRIVATE
+    ${PROJECT_BINARY_DIR}/src
 )

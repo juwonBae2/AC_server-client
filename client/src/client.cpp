@@ -46,7 +46,7 @@ bool Client::connectToServer(int client_socket, const struct sockaddr_in &server
 {
     // 서버에 연결
     int result = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
-    std::string server_connection_failure = console_stlye::makeInverse("Unable to connect to server.");
+    std::string server_connection_failure = console_stlye::makeInverse(color::setColor(color::ForeGround::GREEN) + "Unable to connect to server." + color::setColor(color::ForeGround::RESET));
 
     if (result < 0)
     {
@@ -81,7 +81,7 @@ void Client::run()
         receive_message = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
         if (receive_message <= 0)
         {
-            std::cerr << "Failed to receive message." << std::endl;
+            fmt::print(color::setColor(color::ForeGround::RED) + "Failed to receive message. Please check server status.\n" + color::setColor(color::ForeGround::RESET));
             break;
         }
 
@@ -95,7 +95,7 @@ void Client::run()
         }
 
         // 사용자로부터 메시지 입력
-        std::cout << "User: ";
+        std::cout << (color::setColor(color::ForeGround::BRIGHT_GREEN) + "User: " + color::setColor(color::ForeGround::RESET));
         std::string message;
         std::getline(std::cin, message);
 
