@@ -1,18 +1,48 @@
 #include <iostream>
-#include <string>
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <unistd.h>
+#include "spdlog/fmt/fmt.h"
+#include "client.hpp"
+#include "consoleStyle.hpp"
 
-int main()
+Client::Client(const std::string &server_IP, int port_num)
 {
-    int clientSocket, portNum, n;
-    char buffer[1024];
-    struct sockaddr_in serverAddr
+    // 소켓 생성
+    client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket < 0)
     {
-    };
+        std::cerr << "Socket creation failed." << std::endl;
+        return;
+    }
 
-    std::string serverIP = "127.0.0.1";
+    // 서버 주소 초기화
+    memset(&server_address, '\0', sizeof(server_address));
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(port_num);
+    if (inet_pton(AF_INET, server_IP.c_str(), &(server_address.sin_addr)) <= 0)
+    {
+        std::cerr << "IP address setting failed." << std::endl;
+        return;
+    }
+
+    std::string text = "Unable to connect to server.";
+    std::string inverseText = console_stlye::makeInverse(text);
+
+    // 서버에 연결
+    if (connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
+    {
+        std::cerr << inverseText << std::endl;
+        // std::cerr << "Unable to connect to server." << std::endl;
+        return;
+    }
+}
+
+void Client::run()
+{
+    int n;
+    char buffer[1024];
+
+    // std::string serverIP = "127.0.0.1";
     // TODO: IP를 받게 할 지 안 할지는 미정
     // std::string serverIP;
     // std::cout << "서버의 IP 주소를 입력하세요: ";
@@ -23,61 +53,33 @@ int main()
     // std::cout << "서버의 포트 번호를 입력하세요: ";
     // std::cin >> portNum;
 
-    // 소켓 생성
-    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket < 0)
-    {
-        std::cerr << "소켓 생성에 실패했습니다." << std::endl;
-        return 1;
-    }
-
-    // 서버 주소 초기화
-    memset(&serverAddr, '\0', sizeof(serverAddr));
-    portNum = 7777;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(portNum);
-    if (inet_pton(AF_INET, serverIP.c_str(), &(serverAddr.sin_addr)) <= 0)
-    {
-        std::cerr << "IP 주소 설정에 실패했습니다." << std::endl;
-        return 1;
-    }
-
-    // 서버에 연결
-    if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
-    {
-        std::cerr << "서버에 연결할 수 없습니다." << std::endl;
-        return 1;
-    }
-
     while (true)
     {
         // 서버로부터 메시지 수신
         memset(buffer, '\0', sizeof(buffer));
-        n = recv(clientSocket, buffer, sizeof(buffer), 0);
+        n = recv(client_socket, buffer, sizeof(buffer), 0);
         if (n <= 0)
         {
-            std::cerr << "메시지 수신에 실패했습니다." << std::endl;
+            std::cerr << "Failed to receive message." << std::endl;
             break;
         }
 
         // TODO: 서버를 통해서가 아닌 client 자체로 통신할지 안할지 여부
-        // std::cout << "서버: " << buffer << std::endl;
+        // std::cout << "Server: " << buffer << std::endl;
 
         // 종료 메시지 수신 시 채팅 종료
         if (strcmp(buffer, "종료") == 0)
             break;
 
         // 사용자로부터 메시지 입력
-        std::cout << "사용자: ";
+        std::cout << "User: ";
         std::string message;
         std::getline(std::cin, message);
 
         // 메시지 서버로 전송
-        send(clientSocket, message.c_str(), message.length(), 0);
+        send(client_socket, message.c_str(), message.length(), 0);
     }
 
     // 소켓 종료
-    close(clientSocket);
-
-    return 0;
+    close(client_socket);
 }
