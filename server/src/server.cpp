@@ -62,7 +62,7 @@ int main()
     }, client_address{};
     socklen_t client_address_length;
 
-    std::string welcome_message = "▶ Welcome to chatting server.";
+    std::string welcome_message = R"(  ▶ Welcome to chatting server ◀)";
 
     // TODO: 이거 왜 작동 안 해
     // 포트 번호 입력 받기
@@ -112,16 +112,23 @@ int main()
     // std::cout << "서버 IP 주소: " << ip << std::endl;
 
     std::cout << color::setColor(color::ForeGround::GREEN) + R"(
-  ___   _____      _____  _____ ______  _   _  _____ ______      _____ ______  _____  _   _  _____ ______
- / _ \ /  __ \    /  ___||  ___|| ___ \| | | ||  ___|| ___ \    |  _  || ___ \|  ___|| \ | ||  ___||  _  \
-/ /_\ \| /  \/    \ `--. | |__  | |_/ /| | | || |__  | |_/ /    | | | || |_/ /| |__  |  \| || |__  | | | |
-|  _  || |         `--. \|  __| |    / | | | ||  __| |    /     | | | ||  __/ |  __| | . ` ||  __| | | | |
-| | | || \__/\    /\__/ /| |___ | |\ \ \ \_/ /| |___ | |\ \     \ \_/ /| |    | |___ | |\  || |___ | |/ /
-\_| |_/ \____/    \____/ \____/ \_| \_| \___/ \____/ \_| \_|     \___/ \_|    \____/ \_| \_/\____/ |___/   o
+ _____  _____ ______  _   _  _____ ______      _____ ______  _____  _   _  _____ ______
+/  ___||  ___|| ___ \| | | ||  ___|| ___ \    /  _  \| ___ \|  ___|| \ | ||  ___||  _  \
+\ `--. | |__  | |_/ /| | | || |__  | |_/ /    | | | || |_/ /| |__  |  \| || |__  | | | |
+ `--. \|  __| |    / | | | ||  __| |    /     | | | ||  __/ |  __| | . ` ||  __| | | | |
+/\__/ /| |___ | |\ \ \ \_/ /| |___ | |\ \     \ \_/ /| |    | |___ | |\  || |___ | |/ /
+\____/ \____/ \_| \_| \___/ \____/ \_| \_|     \___/ \_|    \____/ \_| \_/\____/ |___/   o
+
+    ∧_____∧
+   ( ̳• ·̫ • ̳)
+┏ー∪∪━━━━━━━━┓
+  ♡°•. message .•°♡
+┗━--━━━━━•━━━┛
+
  )" + color::setColor(color::ForeGround::RESET)
+              // TODO: 아래가 작동하면 지울 예정
+              << color::setColor(color::ForeGround::BRIGHT_WHITE) + welcome_message + color::setColor(color::ForeGround::RESET)
               << std::endl;
-    // TODO: 아래가 작동하면 지울 예정
-    std::cout << color::setColor(color::ForeGround::GREEN) + welcome_message + color::setColor(color::ForeGround::RESET) << std::endl;
 
     while (true)
     {
