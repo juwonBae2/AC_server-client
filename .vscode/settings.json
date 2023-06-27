@@ -7,6 +7,7 @@
     // Cmake
     "cmake.configureOnOpen": false,
     "cmake.configureOnEdit": false,
+    "cmake.cmakePath": "/opt/homebrew/bin/cmake",
     "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.statusbar.visibility": "compact",
     "cmake.parallelJobs": 8,

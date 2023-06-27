@@ -1,5 +1,5 @@
-# CMake버전 3.24.2
-cmake_minimum_required(VERSION 3.24.2)
+# CMake버전 3.26.4
+cmake_minimum_required(VERSION 3.26.4)
 
 # 프로젝트 이름과 몇가지 유용한 설정
 project(server-client VERSION 1.0.0
@@ -130,3 +130,4 @@ endfunction()
 add_subdirectory_with_static_analysis(consoleStyle)
 add_subdirectory_with_static_analysis(client)
 add_subdirectory_with_static_analysis(server)
+add_subdirectory_with_static_analysis(messageExchange)

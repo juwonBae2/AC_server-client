@@ -135,9 +135,6 @@ void Client::run()
             break;
         }
 
-        // TODO: 서버를 통해서가 아닌 client 자체로 통신할지 안할지 여부
-        // std::cerr << "Server: " << buffer << std::endl;
-
         while (true)
         {
             // 메시지 입력
