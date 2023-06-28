@@ -4,6 +4,8 @@
 class Message
 {
 public:
+    Message(int socket) : client_socket(socket) {}
+
     void receiveMessage();
     void sendMessage();
 

@@ -1,7 +1,7 @@
-project(messageExchange)
+project(chatHandler)
 
 add_library(${PROJECT_NAME}
-    src/messageExchange.cpp
+    src/chatHandler.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -22,7 +22,9 @@ void handleClient(int client_socket)
         receive_message = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
         if (receive_message <= 0)
         {
-            std::cerr << "The connection with the client has been terminated." << std::endl;
+            std::cerr << "The connection with the " << color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET)
+                      << color::setColor(color::ForeGround::BRIGHT_RED) + std::to_string(client_socket) + color::setColor(color::ForeGround::RESET) << " has been terminated." << std::endl;
+
             break;
         }
 
@@ -32,7 +34,9 @@ void handleClient(int client_socket)
         // 종료 메시지 수신 시 클라이언트 연결 종료
         if (strcmp(buffer.data(), "exit") == 0)
         {
-            std::cerr << "The connection with the client has been terminated." << std::endl;
+            std::cerr << "The connection with the " << color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET)
+                      << color::setColor(color::ForeGround::BRIGHT_RED) + std::to_string(client_socket) + color::setColor(color::ForeGround::RESET) << " has been terminated." << std::endl;
+
             break;
         }
         // 다른 클라이언트들에게 메시지 전달
@@ -101,12 +105,12 @@ int main()
     }
 
     // TODO: IP 까지 할 지 안 할지는 미정
-    // // 서버 IP 주소 출력
+    // 서버 IP 주소 출력
     // struct sockaddr_in serverInfo
     // {
     // };
     // socklen_t serverInfoLength = sizeof(serverInfo);
-    // getsockname(serverSocket, (struct sockaddr *)&serverInfo, &serverInfoLength);
+    // getsockname(server_socket, (struct sockaddr *)&serverInfo, &serverInfoLength);
     // char ip[INET_ADDRSTRLEN];
     // inet_ntop(AF_INET, &(serverInfo.sin_addr), ip, INET_ADDRSTRLEN);
     // std::cout << "서버 IP 주소: " << ip << std::endl;

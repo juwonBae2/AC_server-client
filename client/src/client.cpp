@@ -110,51 +110,15 @@ bool Client::connectToServer(int client_socket, const struct sockaddr_in &server
 
 void Client::run()
 {
-    int receive_message;
-    std::array<char, 1024> buffer;
-
-    // TODO: IP를 받게 할 지 안 할지는 미정
-    // std::string serverIP;
-    // std::cerr << "서버의 IP 주소를 입력하세요: ";
-    // std::cin >> serverIP;
-
     // TODO: 이거 왜 작동 안해
     // 서버의 포트 번호 입력 받기
     // std::cerr << "서버의 포트 번호를 입력하세요: ";
     // std::cin >> portNum;
 
-    while (true)
-    {
-        buffer.fill('\0');
+    Message messageHandler(client_socket);
+    std::thread receive_message(&Message::receiveMessage, &messageHandler);
+    std::thread send_message(&Message::sendMessage, &messageHandler);
 
-        // 서버로부터 메시지 수신
-        receive_message = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
-        if (receive_message <= 0)
-        {
-            fmt::print(color::setColor(color::ForeGround::RED) + "Failed to receive message. Please check server status.\n" + color::setColor(color::ForeGround::RESET));
-            break;
-        }
-
-        while (true)
-        {
-            // 메시지 입력
-            std::cerr << (color::setColor(color::ForeGround::BRIGHT_GREEN) + "User: " + color::setColor(color::ForeGround::RESET));
-            std::string message;
-            std::getline(std::cin, message);
-
-            // 메시지 서버로 전송
-            send(client_socket, message.c_str(), message.length(), 0);
-
-            // 종료 메시지 수신 시 채팅 종료 (TODO: 작동안함)
-            if (strcmp(buffer.data(), "exit") == 0)
-            {
-                fmt::print(color::setColor(color::ForeGround::BRIGHT_CYAN) + "Left the chat server.\n" + color::setColor(color::ForeGround::RESET));
-                // close(client_socket);
-                break;
-            }
-        }
-    }
-
-    // 소켓 종료
-    close(client_socket);
+    receive_message.join();
+    send_message.join();
 }
