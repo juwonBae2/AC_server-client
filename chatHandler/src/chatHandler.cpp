@@ -10,12 +10,16 @@ namespace
 {
     int receive_message;
     std::array<char, 1024> buffer;
+    // std::string buffer;
 }
 
 void Message::receiveMessage()
 {
     buffer.fill('\0');
     receive_message = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
+
+    // ?????
+    // receive_message = recv(client_socket, const_cast<char *>(buffer.data()), buffer.size() - 1, 0);
 
     if (receive_message <= 0)
     {
