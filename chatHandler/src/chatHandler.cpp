@@ -6,13 +6,6 @@
 #include "color.hpp"
 #include "spdlog/fmt/fmt.h"
 
-namespace
-{
-    int receive_message;
-    std::array<char, 1024> buffer;
-    // std::string buffer;
-}
-
 void Message::receiveMessage()
 {
     buffer.fill('\0');
