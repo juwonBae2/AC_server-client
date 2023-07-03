@@ -7,17 +7,6 @@
 #include "color.hpp"
 #include <thread>
 
-class pipe_ret_t
-{
-private:
-    bool success_flag_ = false;
-    std::string msg_ = "";
-
-public:
-    bool isSuccessful() const { return success_flag_; }
-    std::string message() const { return msg_; }
-};
-
 Client::Client(const std::string &server_IP, int port_num)
 {
     // 소켓 생성
@@ -30,18 +19,13 @@ Client::Client(const std::string &server_IP, int port_num)
 
     initializeServerAddress(server_address, server_IP, port_num);
 
-    bool connected = false;
     auto start_time = std::chrono::steady_clock::now();
-    int loop_count = 0;
-
-    pipe_ret_t success_flag;
-    connected = success_flag.isSuccessful();
+    auto end_time = start_time + std::chrono::seconds(10);
 
     if (!this->connectToServer(client_socket, server_address))
     {
-        while (connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
+        while (start_time < end_time)
         {
-            loop_count++;
             std::cerr << color::setColor(color::ForeGround::BRIGHT_CYAN) + "Client failed to connect.\n" + color::setColor(color::ForeGround::RESET)
                       << "Make sure the server is open and listening\n";
 
@@ -70,9 +54,9 @@ Client::Client(const std::string &server_IP, int port_num)
             }
         }
 
-        // 서버 연결 실패 시 처리
-        close(client_socket);
-        return;
+        // // 서버 연결 실패 시 처리
+        // close(client_socket);
+        // return;
     }
     std::cerr << "Server connected successfully\n";
     // 채팅 시작
@@ -92,7 +76,6 @@ void Client::initializeServerAddress(struct sockaddr_in &server_address, const s
     }
 }
 
-// TODO:아래 함수 전체 수정할 예정
 bool Client::connectToServer(int client_socket, const struct sockaddr_in &server_address)
 {
     // 서버에 연결
@@ -110,8 +93,8 @@ bool Client::connectToServer(int client_socket, const struct sockaddr_in &server
 
 void Client::run()
 {
-    // TODO: 이거 왜 작동 안해
     // 서버의 포트 번호 입력 받기
+    // int portNum;
     // std::cerr << "서버의 포트 번호를 입력하세요: ";
     // std::cin >> portNum;
 
