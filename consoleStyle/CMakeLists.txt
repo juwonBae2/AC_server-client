@@ -3,6 +3,7 @@ project(consoleStyle)
 add_library(${PROJECT_NAME}
     src/consoleStyle.cpp
     src/functionTest.cpp
+    src/executionResult.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
