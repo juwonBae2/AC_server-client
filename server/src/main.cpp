@@ -1,8 +1,11 @@
-#include <iostream>
+#include "server.hpp"
 
 int main()
 {
-    std::cout << "This is where you run the server." << std::endl;
+    int port = 7777;
+
+    ChatServer server;
+    server.start(port);
 
     return 0;
 }

@@ -12,7 +12,7 @@ public:
     bool isSuccessful() const { return successFlag_; }
 
     static ExecutionResult failure(const std::string &message_);
-    static ExecutionResult sucess(const std::string &message_);
+    static ExecutionResult success(const std::string &message_);
 
 private:
     bool successFlag_ = false;

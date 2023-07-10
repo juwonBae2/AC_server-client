@@ -116,6 +116,7 @@
         "iterator": "cpp",
         "utility": "cpp",
         "__verbose_abort": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "*.def": "cpp"
     }
 }
