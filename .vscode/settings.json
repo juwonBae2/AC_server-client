@@ -28,6 +28,7 @@
     "cmake.debugConfig": {
         "cwd": "${command:cmake.buildDirectory}/",
         "args": [
+            "./bin/client",
             // "--gtest_filter=TestAutocryptV2XBasic.GetCertificatesFromSecuredMessage",
         ]
     },
