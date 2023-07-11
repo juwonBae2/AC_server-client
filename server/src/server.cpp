@@ -33,7 +33,7 @@ void ChatServer::start(int port_num)
 ┗━--━━━━━•━━━┛
 
  )" + color::setColor(color::ForeGround::RESET)
-                  << color::setColor(color::ForeGround::BRIGHT_WHITE) + welcome_message + color::setColor(color::ForeGround::RESET)
+                  << color::setColor(color::ForeGround::BRIGHT_WHITE) + welcome_message + color::setColor(color::ForeGround::RESET) << "\n"
                   << std::endl;
 
         acceptClients();

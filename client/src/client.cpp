@@ -1,11 +1,4 @@
-#include <iostream>
-#include <sys/socket.h>
-#include <unistd.h>
-#include "spdlog/fmt/fmt.h"
 #include "client.hpp"
-#include "consoleStyle.hpp"
-#include "color.hpp"
-#include <thread>
 
 ExecutionResult Client::connectTo(const std::string &server_IP, int port_num)
 {
@@ -18,21 +11,10 @@ ExecutionResult Client::connectTo(const std::string &server_IP, int port_num)
     }
 
     // TODO: ExecutionResult를 사용해 성공 실패 여부를 결정
-    // try
-    // {
     this->server_IP = server_IP;
     this->port_num = port_num;
     std::cerr << "Server connected successfully\n";
     // 채팅 시작
-
-    // 수요일까지 빼기 ㅈㅂㅈㅂ
-    run();
-
-    // }
-    // catch (const std::runtime_error &error)
-    // {
-    //     return ExecutionResult::failure(error.what());
-    // }
 
     return ExecutionResult::success("success");
 }
@@ -70,22 +52,22 @@ bool Client::connectToServer()
 
 void Client::run()
 {
-    if (!connectToServer())
-    {
-        std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "Server connection timed out." + color::setColor(color::ForeGround::RESET) << std::endl;
-        close(client_socket);
-        return;
-    }
-    else
-    {
-        // 채팅 시작
-        Message messageHandler(client_socket);
-        std::thread receive_message(&Message::receiveMessage, &messageHandler);
-        std::thread send_message(&Message::sendMessage, &messageHandler);
+    // if (!connectToServer())
+    // {
+    //     std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "Server connection timed out." + color::setColor(color::ForeGround::RESET) << std::endl;
+    //     close(client_socket);
+    //     return;
+    // }
+    // else
+    // {
+    // 채팅 시작
+    Message messageHandler(client_socket);
+    std::thread receive_message(&Message::receiveMessage, &messageHandler);
+    std::thread send_message(&Message::sendMessage, &messageHandler);
 
-        receive_message.join();
-        send_message.join();
-    }
+    receive_message.join();
+    send_message.join();
+    // }
 
     // 서버의 포트 번호 입력 받기
     // int portNum;

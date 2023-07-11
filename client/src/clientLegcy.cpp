@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "spdlog/fmt/fmt.h"
-#include "client.hpp"
+#include "clientLegcy.hpp"
 #include "consoleStyle.hpp"
 #include "color.hpp"
 #include <thread>
@@ -51,11 +51,10 @@ Client::Client(const std::string &server_IP, int port_num)
     run();
 }
 
-void Client::connectTo
+// void Client::connectTo
 
-    // 서버 주소 초기화
-    void
-    Client::initializeServerAddress(struct sockaddr_in &server_address, const std::string &server_IP, int port_num)
+// 서버 주소 초기화
+void Client::initializeServerAddress(struct sockaddr_in &server_address, const std::string &server_IP, int port_num)
 {
     memset(&server_address, '\0', sizeof(server_address));
     server_address.sin_family = AF_INET;

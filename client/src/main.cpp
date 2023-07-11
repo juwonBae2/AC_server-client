@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include <thread>
 
 int main()
 {
@@ -7,37 +8,29 @@ int main()
 
     Client client;
     ExecutionResult result = client.connectTo(serverIP, portNum);
-    // else
 
-    // if (!connectToServer())
-    // {
-    //     auto start_time = std::chrono::steady_clock::now();
-    //     auto end_time = start_time + std::chrono::seconds(10);
+    if (!client.connectToServer())
+    {
+        auto start_time = std::chrono::steady_clock::now();
+        auto end_time = start_time + std::chrono::seconds(100);
 
-    //     while (std::chrono::steady_clock::now() < end_time)
-    //     {
-    //         std::cerr << color::setColor(color::ForeGround::BRIGHT_CYAN) + "Client failed to connect.\n" + color::setColor(color::ForeGround::RESET)
-    //                   << "Make sure the server is open and listening\n";
+        while (std::chrono::steady_clock::now() < end_time)
+        {
+            if (client.connectToServer())
+            {
+                client.run();
+                break;
+            }
 
-    //         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    //         std::cerr << color::setColor(color::ForeGround::GREEN) + "Retrying to connect...\n\n" + color::setColor(color::ForeGround::RESET);
-
-    //         if (connectToServer())
-    //         {
-    //             std::cerr << "Server connected successfully\n";
-    //             // 채팅 시작
-    //             break;
-    //         }
-    //     }
-
-    //     if (std::chrono::steady_clock::now() >= end_time)
-    //     {
-    //         std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "Server connection timed out." + color::setColor(color::ForeGround::RESET) << std::endl;
-    //         // close();
-    //         return;
-    //     }
-    // }
+            std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "Server connection timed out." + color::setColor(color::ForeGround::RESET) << std::endl;
+        }
+    }
+    else
+    {
+        client.run();
+    }
 
     return 0;
 }

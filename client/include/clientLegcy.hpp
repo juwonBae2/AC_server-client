@@ -18,11 +18,11 @@
 class Client
 {
 public:
-    ExecutionResult connectTo(const std::string &server_IP, int port_num);
+    Client(const std::string &server_IP, int port_num);
     ExecutionResult sendMsg(const char *msg, size_t size);
 
     void run();
-    bool connectToServer();
+    bool connectToServer(int client_socket, const struct sockaddr_in &server_address);
 
 private:
     int client_socket;
