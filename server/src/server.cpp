@@ -100,6 +100,7 @@ void ChatServer::acceptClients()
         send(new_socket, welcome_message.c_str(), welcome_message.length(), 0);
         client_sockets.push_back(new_socket);
 
+        // 이거 때문에 서버 닫는 시간이 오래걸림
         std::thread client_thread(&ChatServer::handleClient, this, new_socket);
         client_thread.detach();
     }

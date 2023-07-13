@@ -8,13 +8,13 @@
 
 void Message::receiveMessage()
 {
-    buffer.fill('\0');
-    receive_message = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
+    buffer_.fill('\0');
+    receive_message_ = recv(client_socket_, buffer_.data(), buffer_.size() - 1, 0);
 
     // ?????
     // receive_message = recv(client_socket, const_cast<char *>(buffer.data()), buffer.size() - 1, 0);
 
-    if (receive_message <= 0)
+    if (receive_message_ <= 0)
     {
         fmt::print(color::setColor(color::ForeGround::RED) + "Failed to receive message. Please check server status.\n" + color::setColor(color::ForeGround::RESET));
     }
@@ -32,7 +32,7 @@ void Message::sendMessage()
         std::getline(std::cin, message);
 
         // 메시지 서버로 전송
-        send(client_socket, message.c_str(), message.length(), 0);
+        send(client_socket_, message.c_str(), message.length(), 0);
 
         // exit 메시지 수신 시 채팅 종료
         if (message == "exit")

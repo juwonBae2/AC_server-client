@@ -18,23 +18,23 @@
 class Client
 {
 public:
-    ExecutionResult connectTo(const std::string &server_IP, int port_num);
-    ExecutionResult sendMsg(const char *msg, size_t size);
+    ExecutionResult connectTo(const std::string &server_ip_, int port_num_);
+    ExecutionResult sendMsg(const char *msg_, size_t size_);
 
     void run();
     bool connectToServer();
 
 private:
-    int client_socket;
-    struct sockaddr_in server_address;
+    int client_socket_;
+    struct sockaddr_in server_address_;
 
-    std::string server_IP;
-    int port_num;
+    std::string server_ip_;
+    int port_num_;
 
-    std::atomic<bool> isConnected;
-    std::atomic<bool> isClosed;
+    std::atomic<bool> is_connected_;
+    std::atomic<bool> is_closed_;
 
-    void initializeServerAddress(struct sockaddr_in &server_address, const std::string &server_IP, int port_num);
+    void initializeServerAddress(struct sockaddr_in &server_address_, const std::string &server_ip_, int port_num_);
 
     // ExecutionResult close();
 };
