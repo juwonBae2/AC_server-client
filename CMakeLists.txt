@@ -56,6 +56,28 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
+
+# clang으로 분석 (TODO)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  # clang-tidy를 통해 정적 분석 수행
+  option(CLANG_TIDY_FIX "Perform fixes for Clang-Tidy" OFF)
+  find_program(
+    CLANG_TIDY_EXE
+    NAMES "clang-tidy"
+    DOC "Path to clang-tidy executable"
+  )
+  find_program( # clang이 사용되는 것은 아니나, clang-tidy의 올바른 동작을 위해 필요함
+    CLANG_EXE
+    NAMES "clang"
+    DOC "Path to clang executable"
+  )
+
+  # 정적 분석 준비
+  if((NOT CLANG_TIDY_EXE) OR (NOT CLANG_EXE))
+    message(FATAL_ERROR "clang-tidy tool not found")
+  endif()
+endif()
+
 # 의존성 가져오기 #
 include(FetchContent)
 
