@@ -1,8 +1,8 @@
 #pragma once
 
-#include "chatHandler.hpp"
-#include "executionResult.hpp"
-#include "consoleStyle.hpp"
+#include "chat_handler.hpp"
+#include "execution_result.hpp"
+#include "console_style.hpp"
 #include "color.hpp"
 #include "spdlog/fmt/fmt.h"
 

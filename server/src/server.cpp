@@ -9,8 +9,8 @@
 
 ChatServer::ChatServer()
 {
-    server_socket = -1;
-    welcome_message = R"(  ▶ Welcome to chatting server ◀)";
+    server_socket_ = -1;
+    welcome_message_ = R"(  ▶ Welcome to chatting server ◀)";
 }
 
 void ChatServer::start(int port_num)
@@ -33,7 +33,7 @@ void ChatServer::start(int port_num)
 ┗━--━━━━━•━━━┛
 
  )" + color::setColor(color::ForeGround::RESET)
-                  << color::setColor(color::ForeGround::BRIGHT_WHITE) + welcome_message + color::setColor(color::ForeGround::RESET) << "\n"
+                  << color::setColor(color::ForeGround::BRIGHT_WHITE) + welcome_message_ + color::setColor(color::ForeGround::RESET) << "\n"
                   << std::endl;
 
         acceptClients();
@@ -42,8 +42,8 @@ void ChatServer::start(int port_num)
 
 bool ChatServer::createSocket()
 {
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket < 0)
+    server_socket_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket_ < 0)
     {
         std::cerr << "Socket creation failed." << std::endl;
         return false;
@@ -62,7 +62,7 @@ bool ChatServer::bindSocket(int port_num)
     server_address.sin_port = htons(port_num);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
+    if (bind(server_socket_, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
     {
         std::cerr << "Binding failed." << std::endl;
         return false;
@@ -72,7 +72,7 @@ bool ChatServer::bindSocket(int port_num)
 
 bool ChatServer::listenForConnection()
 {
-    if (listen(server_socket, 10) < 0)
+    if (listen(server_socket_, 10) < 0)
     {
         std::cerr << "Failed to wait for connection." << std::endl;
         return false;
@@ -90,15 +90,15 @@ void ChatServer::acceptClients()
     while (true)
     {
         client_address_length = sizeof(client_address);
-        int new_socket = accept(server_socket, (struct sockaddr *)&client_address, (socklen_t *)&client_address_length);
+        int new_socket = accept(server_socket_, (struct sockaddr *)&client_address, (socklen_t *)&client_address_length);
         if (new_socket < 0)
         {
             std::cerr << "Failed to accept connection." << std::endl;
             return;
         }
 
-        send(new_socket, welcome_message.c_str(), welcome_message.length(), 0);
-        client_sockets.push_back(new_socket);
+        send(new_socket, welcome_message_.c_str(), welcome_message_.length(), 0);
+        client_sockets_.push_back(new_socket);
 
         // 이거 때문에 서버 닫는 시간이 오래걸림
         std::thread client_thread(&ChatServer::handleClient, this, new_socket);
@@ -133,7 +133,7 @@ void ChatServer::handleClient(int client_socket)
             break;
         }
 
-        for (int client : client_sockets)
+        for (int client : client_sockets_)
         {
             if (client != client_socket)
             {
@@ -143,9 +143,9 @@ void ChatServer::handleClient(int client_socket)
     }
 
     close(client_socket);
-    auto remove_socket = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
-    if (remove_socket != client_sockets.end())
+    auto remove_socket = std::find(client_sockets_.begin(), client_sockets_.end(), client_socket);
+    if (remove_socket != client_sockets_.end())
     {
-        client_sockets.erase(remove_socket);
+        client_sockets_.erase(remove_socket);
     }
 }

@@ -4,28 +4,28 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "spdlog/fmt/fmt.h"
-#include "clientLegcy.hpp"
-#include "consoleStyle.hpp"
+#include "client_legcy.hpp"
+#include "console_style.hpp"
 #include "color.hpp"
 #include <thread>
 
 Client::Client(const std::string &server_IP, int port_num)
 {
     // 소켓 생성
-    client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_socket < 0)
+    client_socket_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket_ < 0)
     {
         std::cerr << "Socket creation failed." << std::endl;
         return;
     }
 
-    initializeServerAddress(server_address, server_IP, port_num);
+    initializeServerAddress(server_address_, server_IP, port_num);
 
     bool connected = false;
     auto start_time = std::chrono::steady_clock::now();
     int loop_count = 0;
 
-    while (!connectToServer(client_socket, server_address))
+    while (!connectToServer(client_socket_, server_address_))
     {
         loop_count++;
         std::cerr << color::setColor(color::ForeGround::BRIGHT_CYAN) + "Client failed to connect.\n" + color::setColor(color::ForeGround::RESET)
@@ -41,7 +41,7 @@ Client::Client(const std::string &server_IP, int port_num)
         if (elapsed_time.count() >= 10)
         {
             std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "Server connection timed out." + color::setColor(color::ForeGround::RESET) << std::endl;
-            close(client_socket);
+            close(client_socket_);
             return;
         }
     }
@@ -88,7 +88,7 @@ void Client::run()
     std::cerr << "서버의 포트 번호를 입력하세요: ";
     std::cin >> portNum;
 
-    Message messageHandler(client_socket);
+    Message messageHandler(client_socket_);
     std::thread receive_message(&Message::receiveMessage, &messageHandler);
     std::thread send_message(&Message::sendMessage, &messageHandler);
 

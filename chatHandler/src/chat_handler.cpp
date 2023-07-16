@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "chatHandler.hpp"
-#include "consoleStyle.hpp"
+#include "chat_handler.hpp"
+#include "console_style.hpp"
 #include "color.hpp"
 #include "spdlog/fmt/fmt.h"
 

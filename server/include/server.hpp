@@ -7,9 +7,9 @@
 class ChatServer
 {
 private:
-    int server_socket;
-    std::vector<int> client_sockets;
-    std::string welcome_message;
+    int server_socket_;
+    std::vector<int> client_sockets_;
+    std::string welcome_message_;
 
 public:
     ChatServer();

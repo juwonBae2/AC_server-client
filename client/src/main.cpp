@@ -3,11 +3,11 @@
 
 int main()
 {
-    std::string serverIP = "127.0.0.1"; // 서버 IP 주소
-    int portNum = 7777;                 // 서버 포트 번호
+    std::string server_ip = "127.0.0.1"; // 서버 IP 주소
+    int portNum = 7777;                  // 서버 포트 번호
 
     Client client;
-    ExecutionResult result = client.connectTo(serverIP, portNum);
+    ExecutionResult result = client.connectTo(server_ip, portNum);
 
     if (!client.connectToServer())
     {
