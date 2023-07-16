@@ -1,35 +1,24 @@
 #include "client.hpp"
-#include <thread>
 
 int main()
 {
     std::string server_ip = "127.0.0.1"; // 서버 IP 주소
-    int portNum = 7777;                  // 서버 포트 번호
+    int port_num = 7777;                 // 서버 포트 번호
 
     Client client;
-    ExecutionResult result = client.connectTo(server_ip, portNum);
+    ExecutionResult result = client.connectTo(server_ip, port_num);
 
-    if (!client.connectToServer())
+    try
     {
-        auto start_time = std::chrono::steady_clock::now();
-        auto end_time = start_time + std::chrono::seconds(100);
-
-        while (std::chrono::steady_clock::now() < end_time)
+        if (result.success())
         {
-            if (client.connectToServer())
-            {
-                client.run();
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-
-            std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "Server connection timed out." + color::setColor(color::ForeGround::RESET) << std::endl;
+            client.run();
         }
     }
-    else
+
+    catch (const std::exception &e)
     {
-        client.run();
+        std::cerr << "Failed to connect to the server: " << result.message() << std::endl;
     }
 
     return 0;

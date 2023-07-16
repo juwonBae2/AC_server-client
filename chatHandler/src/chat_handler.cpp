@@ -6,20 +6,27 @@
 #include "color.hpp"
 #include "spdlog/fmt/fmt.h"
 
+// TODO: 추후 receiveMessage() 에 포트번호나 client의 이름을 받도록 인자를 추가 할 예정, 추가 후 18줄 수정
 void Message::receiveMessage()
 {
-    buffer_.fill('\0');
-    receive_message_ = recv(client_socket_, buffer_.data(), buffer_.size() - 1, 0);
-
-    // ?????
-    // receive_message = recv(client_socket, const_cast<char *>(buffer.data()), buffer.size() - 1, 0);
-
-    if (receive_message_ <= 0)
+    while (true)
     {
-        fmt::print(color::setColor(color::ForeGround::RED) + "Failed to receive message. Please check server status.\n" + color::setColor(color::ForeGround::RESET));
+        int receive_message = recv(client_socket_, buffer_.data(), buffer_.size() - 1, 0);
+        if (receive_message <= 0)
+        {
+            fmt::print(color::setColor(color::ForeGround::RED) + "Failed to receive message. Please check server status.\n" + color::setColor(color::ForeGround::RESET));
+            break;
+        }
+
+        buffer_[receive_message] = '\0';
+        std::cout << "Server: " << buffer_.data() << std::endl;
+
+        if (std::string(buffer_.data()) == "exit")
+        {
+            std::cout << "Left the chat server." << std::endl;
+            break;
+        }
     }
-    // TODO: 서버를 통해서가 아닌 client 자체로 통신할지 안할지 여부
-    // std::cerr << "Server: " << buffer << std::endl;
 }
 
 void Message::sendMessage()
@@ -34,7 +41,6 @@ void Message::sendMessage()
         // 메시지 서버로 전송
         send(client_socket_, message.c_str(), message.length(), 0);
 
-        // exit 메시지 수신 시 채팅 종료
         if (message == "exit")
         {
             fmt::print(color::setColor(color::ForeGround::BRIGHT_CYAN) + "Left the chat server.\n" + color::setColor(color::ForeGround::RESET));

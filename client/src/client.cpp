@@ -10,14 +10,25 @@ ExecutionResult Client::connectTo(const std::string &server_ip, int port_num)
         return ExecutionResult::failure(strerror(errno));
     }
 
-    // TODO: ExecutionResult를 사용해 성공 실패 여부를 결정
-    this->server_ip_ = server_ip;
-    this->port_num_ = port_num;
-    std::cerr << "Server connected successfully\n";
-    // 채팅 시작
+    // 서버 주소 초기화
+    server_address_.sin_family = AF_INET;
+    server_address_.sin_port = htons(port_num);
+    if (inet_pton(AF_INET, server_ip.c_str(), &(server_address_.sin_addr)) <= 0)
+    {
+        std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "IP address setting failed." + color::setColor(color::ForeGround::RESET) << std::endl;
 
-    // 미구현
-    return ExecutionResult::success("success");
+        return ExecutionResult::failure(strerror(errno));
+    }
+
+    // 서버에 연결
+    if (connect(client_socket_, (struct sockaddr *)&server_address_, sizeof(server_address_)) < 0)
+    {
+        std::cerr << color::setColor(color::ForeGround::BRIGHT_RED) + "Connection failed." + color::setColor(color::ForeGround::RESET) << std::endl;
+
+        return ExecutionResult::failure(strerror(errno));
+    }
+
+    return ExecutionResult::success("Server connected successfully");
 }
 
 // 서버 주소 초기화

@@ -10,10 +10,11 @@
 ChatServer::ChatServer()
 {
     server_socket_ = -1;
+    is_server_running_ = true;
     welcome_message_ = R"(  ▶ Welcome to chatting server ◀)";
 }
 
-void ChatServer::start(int port_num)
+void ChatServer::startServer(int port_num)
 {
 
     if (createSocket() && bindSocket(port_num) && listenForConnection())
@@ -40,6 +41,11 @@ void ChatServer::start(int port_num)
     }
 }
 
+void ChatServer::stopServer()
+{
+    is_server_running_ = false;
+}
+
 bool ChatServer::createSocket()
 {
     server_socket_ = socket(AF_INET, SOCK_STREAM, 0);
@@ -62,6 +68,14 @@ bool ChatServer::bindSocket(int port_num)
     server_address.sin_port = htons(port_num);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
+    // TODO: 바로 server 부활 용, 포트 번호를 받게 되면 그떄 다시 생각하자
+    int reuse = 1;
+    if (setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0)
+    {
+        std::cerr << "Failed to set SO_REUSEADDR option." << std::endl;
+        return false;
+    }
+
     if (bind(server_socket_, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
     {
         std::cerr << "Binding failed." << std::endl;
@@ -78,6 +92,11 @@ bool ChatServer::listenForConnection()
         return false;
     }
     return true;
+}
+
+void ChatServer::updateClientIdentifier(int client_socket, const std::string &identifier)
+{
+    client_identifiers_[client_socket] = identifier;
 }
 
 void ChatServer::acceptClients()
@@ -100,7 +119,9 @@ void ChatServer::acceptClients()
         send(new_socket, welcome_message_.c_str(), welcome_message_.length(), 0);
         client_sockets_.push_back(new_socket);
 
-        // 이거 때문에 서버 닫는 시간이 오래걸림
+        std::string client_identifier = "CLIENT #" + std::to_string(new_socket);
+        updateClientIdentifier(new_socket, client_identifier);
+
         std::thread client_thread(&ChatServer::handleClient, this, new_socket);
         client_thread.detach();
     }
@@ -120,26 +141,26 @@ void ChatServer::handleClient(int client_socket)
         {
             std::cerr << "The connection with the " << color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET)
                       << color::setColor(color::ForeGround::BRIGHT_RED) + std::to_string(client_socket) + color::setColor(color::ForeGround::RESET) << " has been terminated." << std::endl;
+
+            stopServer();
             break;
         }
 
-        std::cout << color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET) << client_socket
-                  << ": " << color::setColor(color::ForeGround::WHITE) + buffer.data() + color::setColor(color::ForeGround::RESET) << std::endl;
+        std::string message(buffer.data());
 
-        if (strcmp(buffer.data(), "exit") == 0)
+        if (message == "exit")
         {
             std::cerr << "The connection with the " << color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET)
                       << color::setColor(color::ForeGround::BRIGHT_RED) + std::to_string(client_socket) + color::setColor(color::ForeGround::RESET) << " has been terminated." << std::endl;
+
+            stopServer();
             break;
         }
 
-        for (int client : client_sockets_)
-        {
-            if (client != client_socket)
-            {
-                send(client, buffer.data(), receive_message, 0);
-            }
-        }
+        std::cout << "Received message from " << color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET) << client_socket
+                  << ": " << message << std::endl;
+
+        broadcastMessage(message, client_socket);
     }
 
     close(client_socket);
@@ -148,4 +169,23 @@ void ChatServer::handleClient(int client_socket)
     {
         client_sockets_.erase(remove_socket);
     }
+}
+
+void ChatServer::broadcastMessage(const std::string &message, int sender_socket)
+{
+    std::string sender_identifier = client_identifiers_[sender_socket];
+
+    for (const auto &client : client_identifiers_)
+    {
+        int client_socket = client.first;
+        const std::string &client_identifier = client.second;
+
+        if (client_socket != sender_socket)
+        {
+            std::string formatted_message = "[" + sender_identifier + "]: " + message;
+            send(client_socket, formatted_message.c_str(), formatted_message.length(), 0);
+        }
+    }
+
+    std::cout << "Broadcast message from " << color::setColor(color::ForeGround::BRIGHT_BLUE) + sender_identifier + color::setColor(color::ForeGround::RESET) << ": " << message << std::endl;
 }

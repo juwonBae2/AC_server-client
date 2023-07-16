@@ -5,16 +5,15 @@
 class ExecutionResult
 {
 public:
-    ExecutionResult() = default;
-    ExecutionResult(bool successFlag, const std::string message) : successFlag_{successFlag}, message_{message} {}
+    ExecutionResult(bool success, const std::string &message) : success_(success), message_(message) {}
 
-    std::string message() const { return message_; }
-    bool isSuccessful() const { return successFlag_; }
+    bool success() const { return success_; }
+    const std::string &message() const { return message_; }
 
-    static ExecutionResult failure(const std::string &message_);
-    static ExecutionResult success(const std::string &message_);
+    static ExecutionResult failure(const std::string &message);
+    static ExecutionResult success(const std::string &message);
 
 private:
-    bool successFlag_ = false;
-    std::string message_ = "";
+    bool success_;
+    std::string message_;
 };

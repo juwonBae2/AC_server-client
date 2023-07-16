@@ -5,7 +5,7 @@ int main()
     int port = 7777;
 
     ChatServer server;
-    server.start(port);
+    server.startServer(port);
 
     return 0;
 }
