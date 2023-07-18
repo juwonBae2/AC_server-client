@@ -51,8 +51,6 @@ Client::Client(const std::string &server_IP, int port_num)
     run();
 }
 
-// void Client::connectTo
-
 // 서버 주소 초기화
 void Client::initializeServerAddress(struct sockaddr_in &server_address, const std::string &server_IP, int port_num)
 {
