@@ -22,9 +22,10 @@ public:
     ExecutionResult sendMsg(const char *msg_, size_t size_);
 
     void run();
-    bool connectToServer();
 
 private:
+    void initializeServerAddress(struct sockaddr_in &serverAddress, const std::string &serverIP, int portNum);
+
     int client_socket_;
     struct sockaddr_in server_address_;
 
@@ -33,8 +34,6 @@ private:
 
     std::atomic<bool> is_connected_;
     std::atomic<bool> is_closed_;
-
-    void initializeServerAddress(struct sockaddr_in &server_address_, const std::string &server_ip_, int port_num_);
 
     // ExecutionResult close();
 };

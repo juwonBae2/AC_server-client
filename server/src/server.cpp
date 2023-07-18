@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <array>
+#include <thread>
 
 ChatServer::ChatServer()
 {
@@ -16,7 +17,6 @@ ChatServer::ChatServer()
 
 void ChatServer::startServer(int port_num)
 {
-
     if (createSocket() && bindSocket(port_num) && listenForConnection())
     {
         std::cout << color::setColor(color::ForeGround::GREEN) + R"(
@@ -119,7 +119,7 @@ void ChatServer::acceptClients()
         send(new_socket, welcome_message_.c_str(), welcome_message_.length(), 0);
         client_sockets_.push_back(new_socket);
 
-        std::string client_identifier = "CLIENT #" + std::to_string(new_socket);
+        std::string client_identifier = color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET) + std::to_string(new_socket);
         updateClientIdentifier(new_socket, client_identifier);
 
         std::thread client_thread(&ChatServer::handleClient, this, new_socket);
@@ -157,9 +157,6 @@ void ChatServer::handleClient(int client_socket)
             break;
         }
 
-        std::cout << "Received message from " << color::setColor(color::ForeGround::BRIGHT_BLUE) + "CLIENT #" + color::setColor(color::ForeGround::RESET) << client_socket
-                  << ": " << message << std::endl;
-
         broadcastMessage(message, client_socket);
     }
 
@@ -187,5 +184,5 @@ void ChatServer::broadcastMessage(const std::string &message, int sender_socket)
         }
     }
 
-    std::cout << "Broadcast message from " << color::setColor(color::ForeGround::BRIGHT_BLUE) + sender_identifier + color::setColor(color::ForeGround::RESET) << ": " << message << std::endl;
+    std::cout << "Message from " << color::setColor(color::ForeGround::BRIGHT_BLUE) + sender_identifier + color::setColor(color::ForeGround::RESET) << ": " << message << std::endl;
 }

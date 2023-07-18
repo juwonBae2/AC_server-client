@@ -22,9 +22,11 @@ public:
     ExecutionResult sendMsg(const char *msg, size_t size);
 
     void run();
-    bool connectToServer(int client_socket_, const struct sockaddr_in &server_address_);
+    bool connectToServer(int clientSocket, const struct sockaddr_in &serverAddress);
 
 private:
+    void initializeServerAddress(struct sockaddr_in &serverAddress, const std::string &serverIP, int portNum);
+
     int client_socket_;
     struct sockaddr_in server_address_;
 
@@ -34,7 +36,6 @@ private:
     std::atomic<bool> is_connected_;
     std::atomic<bool> is_closed_;
 
-    void initializeServerAddress(struct sockaddr_in &server_address_, const std::string &server_IP_, int port_num_);
-
+    // TODO: disConnect 혹은 close 함수 추가
     // ExecutionResult close();
 };
