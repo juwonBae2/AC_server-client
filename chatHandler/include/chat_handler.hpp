@@ -11,6 +11,8 @@ public:
     void receiveMessage();
     void sendMessage();
 
+    std::string getLineWithPrompt();
+
 private:
     int client_socket_;
     struct sockaddr_in server_address_;

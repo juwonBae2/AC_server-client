@@ -8,17 +8,14 @@ int main()
     Client client;
     ExecutionResult result = client.connectTo(server_ip, port_num);
 
-    try
+    if (result.success())
     {
-        if (result.success())
-        {
-            client.run();
-        }
+        client.run();
     }
-
-    catch (const std::exception &e)
+    else
     {
         std::cerr << "Failed to connect to the server: " << result.message() << std::endl;
+        return 1;
     }
 
     return 0;

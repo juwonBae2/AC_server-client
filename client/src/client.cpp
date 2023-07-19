@@ -1,5 +1,6 @@
 #include "client.hpp"
 
+// TODO: 함수로 뺄 예정.. 전체적으로 리펙토링 해야됨
 ExecutionResult Client::connectTo(const std::string &serverIP, int portNum)
 {
     // 소켓 생성

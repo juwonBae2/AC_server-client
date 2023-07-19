@@ -99,6 +99,7 @@ void ChatServer::updateClientIdentifier(int client_socket, const std::string &id
     client_identifiers_[client_socket] = identifier;
 }
 
+// TODO: 역 충
 void ChatServer::acceptClients()
 {
     struct sockaddr_in client_address
@@ -106,6 +107,7 @@ void ChatServer::acceptClients()
     };
     socklen_t client_address_length;
 
+    // TODO: while 보단 서버 상태에 따라 수정해ㅠ
     while (true)
     {
         client_address_length = sizeof(client_address);
